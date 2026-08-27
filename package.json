@@ -1,6 +1,6 @@
 {
   "name": "@mozilla-services/ads-eng-react-components",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React component library for various ads-eng products",
   "license": "UNLICENSED",
   "repository": {
