@@ -1,14 +1,11 @@
 {
   "name": "@mozilla-services/ads-eng-react-components",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "React component library for various ads-eng products",
-  "license": "UNLICENSED",
+  "license": "MPL-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mozilla-services/ads-eng-react-components.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "type": "module",
   "sideEffects": false,
@@ -40,7 +37,7 @@
     "test:watch": "jest --watch --coverage --maxWorkers=25%",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepublishOnly": "npm run build"
+    "prepare": "npm run build"
   },
   "peerDependencies": {
     "@emotion/react": "^11.14.0",

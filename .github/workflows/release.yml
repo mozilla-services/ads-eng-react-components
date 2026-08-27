@@ -1,0 +1,66 @@
+name: Release
+
+# Consumers install this package straight from a git tag
+# (`github:mozilla-services/ads-eng-react-components#vX.Y.Z`), so the tag *is* the artifact —
+# there's nothing to publish to a registry. What matters instead is that the tag is
+# installable, which is what this workflow proves before anyone depends on it.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Verify the release tag matches package.json
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Release tag '$GITHUB_REF_NAME' does not match package.json version '$PKG_VERSION'."
+            exit 1
+          fi
+
+      - name: Lint and type-check
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:ci
+
+      # A git-tag install builds the package from source via the `prepare` script. If
+      # `prepare` is missing or broken, npm installs a package with no `dist/` and consumers
+      # get an empty module with no error — so install the tag exactly as a consumer would
+      # and assert the built entrypoints are actually there.
+      - name: Verify the tag is installable
+        run: |
+          WORKDIR="$(mktemp -d)"
+          cd "$WORKDIR"
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund \
+            "github:${GITHUB_REPOSITORY}#${GITHUB_REF_NAME}"
+
+          PKG_DIR="node_modules/@mozilla-services/ads-eng-react-components"
+          for f in dist/index.js dist/index.cjs dist/index.d.ts; do
+            if [ ! -s "$PKG_DIR/$f" ]; then
+              echo "::error::$f missing from the installed package — did the 'prepare' script run?"
+              exit 1
+            fi
+          done
+
+          # Peer dependencies are absent here, so only assert the CJS entry loads and its
+          # export surface is non-empty; a full render is covered by the test suite above.
+          COUNT="$(node -p "Object.keys(require('$PWD/'+'$PKG_DIR')).length")"
+          echo "installed package exposes $COUNT exports"
+          test "$COUNT" -gt 50

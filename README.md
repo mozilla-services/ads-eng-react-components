@@ -1,7 +1,12 @@
 # ads-eng-react-components
 
-React component library for various ads-eng products. Published privately to the GitHub
-Packages npm registry as `@mozilla-services/ads-eng-react-components`.
+React component library for various ads-eng products, consumed as
+`@mozilla-services/ads-eng-react-components`. There's no registry — consumers install
+directly from a public git tag, so no tokens or `.npmrc` setup are involved:
+
+```sh
+npm install github:mozilla-services/ads-eng-react-components#v0.3.0
+```
 
 Components here originate in
 [`consvc-shepherd/ad-ops-dashboard`](https://github.com/mozilla-services/consvc-shepherd);
@@ -183,20 +188,36 @@ If a component needs a browser API jsdom lacks, stub it in `jest.setup.ts` rathe
 per-test. `ResizeObserver` and `IntersectionObserver` are already stubbed there (the former
 because `react-resizable-panels` constructs one in a layout effect).
 
-## Publishing
+## Releasing
 
-Publishing runs on **GitHub Release published**
-([`.github/workflows/publish.yml`](.github/workflows/publish.yml)). The workflow refuses to
-publish if the release tag doesn't match `version` in `package.json`.
+Consumers install straight from a **public git tag**, so the tag *is* the artifact — nothing
+is published to a registry.
 
 ```sh
 npm version minor          # or patch / major — creates the commit and the vX.Y.Z tag
 git push --follow-tags
-gh release create v0.2.0 --generate-notes
+gh release create v0.3.0 --generate-notes
 ```
+
+On release, [`.github/workflows/release.yml`](.github/workflows/release.yml) verifies the tag
+matches `version` in `package.json`, runs lint and tests, then **installs the tag exactly as a
+consumer would** and asserts the built entrypoints exist. That last check matters: a git
+install builds the package from source via `prepare`, and if `prepare` is missing or broken
+npm installs a package with an empty `dist/` and *no error* — consumers just get a module with
+no exports.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint, tests, the package
 build, the Storybook build, and `npm pack --dry-run` on every PR and push to `main`.
+
+> The repo must stay **public**. A git install of a private repo needs SSH keys or a token in
+> every consumer and CI job, which is the plumbing this model exists to avoid.
+
+### `prepare`, not `prepublishOnly`
+
+`dist/` is gitignored, so it doesn't exist in a tag. npm builds it at install time by running
+the **`prepare`** script — the only lifecycle hook it runs for git dependencies.
+`prepublishOnly` does *not* run for git installs, which is why it was replaced. Don't remove
+`prepare` or rename it without changing the consumption model.
 
 ### Versioning
 
@@ -204,32 +225,23 @@ Peer dependency ranges are pinned to what ad-ops-dashboard currently uses (React
 Bumping a peer's major is a **major** version bump here, since consumers have to move in
 lockstep.
 
+Git dependencies don't resolve semver ranges: a consumer pins one tag and moves deliberately.
+`npm install` records the tag's exact commit SHA in the lockfile, so `npm ci` stays
+reproducible even if the tag is later moved.
+
 ## Consuming the package
 
-### 1. Authenticate to GitHub Packages
+### 1. Install
 
-The registry requires a token even for reads. Create a classic PAT with the `read:packages`
-scope and put it in your **user** `~/.npmrc` (never the project's):
-
-```
-//npm.pkg.github.com/:_authToken=ghp_yourTokenHere
-```
-
-### 2. Point the scope at GitHub Packages
-
-In the consuming repo's `.npmrc`:
-
-```
-@mozilla-services:registry=https://npm.pkg.github.com
-```
-
-### 3. Install
+No registry, no `.npmrc`, no token:
 
 ```sh
-npm install @mozilla-services/ads-eng-react-components
+npm install github:mozilla-services/ads-eng-react-components#v0.3.0
 ```
 
-### 4. Use it
+Bumping later means changing the tag in `package.json` and re-running `npm install`.
+
+### 2. Use it
 
 ```tsx
 import { Badge, createAdsEngTheme } from "@mozilla-services/ads-eng-react-components"
@@ -245,23 +257,19 @@ detect — `import { ToastContainer } from "@mozilla-services/ads-eng-react-comp
 plain Node ESM script fails on that, while the same import through Vite is fine. Node
 `require()` of the CJS entry works unconditionally, which is what the consumer's Jest uses.
 
-### In CI
+### What a git install needs
 
-`actions/setup-node` wires up the token for you:
+Two things the registry didn't require:
 
-```yaml
-- uses: actions/setup-node@v4
-  with:
-    node-version: 24
-    registry-url: https://npm.pkg.github.com
-    scope: "@mozilla-services"
-- run: npm ci
-  env:
-    NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
+- **A git client.** `npm install` shells out to `git` to clone the tag. Full `node:*` images
+  have it; **`node:*-slim` and `alpine` do not** and will fail on install
+  (ad-ops-dashboard's dev Dockerfile installs it explicitly).
+- **Install scripts enabled.** `prepare` is what builds `dist/`. Under `ignore-scripts=true`
+  the install silently yields a package with no `dist/`, so don't harden that flag on in a
+  consumer without vendoring the build another way.
 
-`GITHUB_TOKEN` only works for repos in the same org; a cross-org consumer needs a PAT
-secret instead.
+Installs are also slower than a registry fetch — npm clones the repo, installs the library's
+devDependencies and runs a build (~15–20s) rather than unpacking a prebuilt tarball.
 
 ### If the consumer's Jest chokes on the import
 

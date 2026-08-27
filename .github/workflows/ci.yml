@@ -33,5 +33,7 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
-      - name: Verify the published tarball contents
+      # Git-tag installs pack the prepared checkout through the same `files` allowlist, so
+      # this still catches a `dist` that didn't get built or files that shouldn't ship.
+      - name: Verify the packed contents
         run: npm pack --dry-run
