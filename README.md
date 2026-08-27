@@ -8,6 +8,9 @@ directly from a public git tag, so no tokens or `.npmrc` setup are involved:
 npm install github:mozilla-services/ads-eng-react-components#v0.3.0
 ```
 
+**📖 [Browse the components on Storybook](https://mozilla-services.github.io/ads-eng-react-components/)**
+— published from the latest release, so it always documents a version you can install.
+
 Components here originate in
 [`consvc-shepherd/ad-ops-dashboard`](https://github.com/mozilla-services/consvc-shepherd);
 the ESLint, TypeScript and Jest setup is deliberately a copy of that repo's so components
@@ -102,6 +105,13 @@ theme definition.
 
 Every component module has a `.stories.tsx` beside it — 143 stories across 20 components,
 with an autodocs page generated per component from its props and the JSDoc on its `meta`.
+
+Published to <https://mozilla-services.github.io/ads-eng-react-components/> by the
+`deploy-storybook` job in [`release.yml`](.github/workflows/release.yml), which runs only
+after the release verification passes — a broken release never becomes the live docs. It uses
+GitHub's Pages *artifact* deployment, so there's no `gh-pages` branch: the build is ~11 MB
+across 138 files and committing that per release would grow history permanently for content
+that's rebuilt every time.
 
 Conventions, if you're adding one:
 
@@ -205,6 +215,8 @@ consumer would** and asserts the built entrypoints exist. That last check matter
 install builds the package from source via `prepare`, and if `prepare` is missing or broken
 npm installs a package with an empty `dist/` and *no error* — consumers just get a module with
 no exports.
+
+It then publishes that tag's Storybook to GitHub Pages (see [Stories](#stories)).
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint, tests, the package
 build, the Storybook build, and `npm pack --dry-run` on every PR and push to `main`.

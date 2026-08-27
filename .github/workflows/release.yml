@@ -1,21 +1,42 @@
 name: Release
 
-# Consumers install this package straight from a git tag
-# (`github:mozilla-services/ads-eng-react-components#vX.Y.Z`), so the tag *is* the artifact —
+# Consumers install this package straight from a git tag, so the tag *is* the artifact —
 # there's nothing to publish to a registry. What matters instead is that the tag is
 # installable, which is what this workflow proves before anyone depends on it.
+#
+# It then publishes the released tag's Storybook to GitHub Pages, gated on that verification
+# so a broken release never becomes the live documentation.
 on:
   release:
     types: [published]
+  # Lets you re-verify an existing tag without cutting a release — a `release` re-run replays
+  # the workflow file as it was at release time, so this is the way to test a change here.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to verify (e.g. v0.3.0)"
+        required: true
 
 permissions:
   contents: read
+
+# Pages allows one in-flight deployment. `cancel-in-progress: false` lets a running deploy
+# finish rather than leaving the site half-updated.
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   verify-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Resolve the tag under test
+        id: tag
+        run: echo "name=${{ inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-node@v4
         with:
@@ -27,11 +48,13 @@ jobs:
       - name: Verify the release tag matches package.json
         run: |
           PKG_VERSION="$(node -p "require('./package.json').version")"
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          TAG_VERSION="${TAG_NAME#v}"
           if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::Release tag '$GITHUB_REF_NAME' does not match package.json version '$PKG_VERSION'."
+            echo "::error::Release tag '$TAG_NAME' does not match package.json version '$PKG_VERSION'."
             exit 1
           fi
+        env:
+          TAG_NAME: ${{ steps.tag.outputs.name }}
 
       - name: Lint and type-check
         run: npm run lint
@@ -48,8 +71,15 @@ jobs:
           WORKDIR="$(mktemp -d)"
           cd "$WORKDIR"
           npm init -y >/dev/null
-          npm install --no-audit --no-fund \
-            "github:${GITHUB_REPOSITORY}#${GITHUB_REF_NAME}"
+
+          # --legacy-peer-deps because this scratch project intentionally has no React/MUI:
+          # the point is to prove the tag clones and builds a real `dist/`, not to re-check
+          # peer resolution (the consuming app covers that). Without it npm fails ERESOLVE.
+          #
+          # git+https rather than the `github:` shorthand so resolution never depends on the
+          # runner having an SSH key.
+          npm install --no-audit --no-fund --legacy-peer-deps \
+            "git+https://github.com/${GITHUB_REPOSITORY}.git#${TAG_NAME}"
 
           PKG_DIR="node_modules/@mozilla-services/ads-eng-react-components"
           for f in dist/index.js dist/index.cjs dist/index.d.ts; do
@@ -59,8 +89,63 @@ jobs:
             fi
           done
 
-          # Peer dependencies are absent here, so only assert the CJS entry loads and its
-          # export surface is non-empty; a full render is covered by the test suite above.
-          COUNT="$(node -p "Object.keys(require('$PWD/'+'$PKG_DIR')).length")"
-          echo "installed package exposes $COUNT exports"
-          test "$COUNT" -gt 50
+          # Checked statically rather than by `require()`-ing the entry: React and MUI are
+          # peer dependencies and are deliberately absent from this scratch project, so
+          # loading the module would fail on a missing peer rather than on anything wrong
+          # with the tag. Whether it renders is already covered by the test suite above; what
+          # this proves is that `prepare` emitted a real public API and not an empty stub.
+          COUNT="$(grep -c '^export ' "$PKG_DIR/dist/index.d.ts")"
+          echo "declared exports in dist/index.d.ts: $COUNT"
+          if [ "$COUNT" -lt 50 ]; then
+            echo "::error::only $COUNT exports in the built d.ts — expected the full public API"
+            exit 1
+          fi
+        env:
+          TAG_NAME: ${{ steps.tag.outputs.name }}
+
+  # Storybook is the reference for what's in the library, so it's published from the released
+  # tag rather than from `main` — the docs then always describe a version someone can install.
+  #
+  # This uses GitHub's Pages *artifact* deployment, so there's no `gh-pages` branch: the build
+  # is ~11 MB across 138 files, and committing that per release would grow the repo's history
+  # permanently for content that's regenerated every time.
+  #
+  # One-time setup: repo Settings -> Pages -> Source -> "GitHub Actions".
+  deploy-storybook:
+    needs: verify-release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write        # to publish the Pages deployment
+      id-token: write     # for the OIDC token deploy-pages exchanges
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # Storybook emits relative asset paths, so the build works unchanged under the
+      # /<repo>/ subpath Pages serves from — no `base` configuration needed.
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: storybook-static
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
