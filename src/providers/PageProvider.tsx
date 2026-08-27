@@ -1,11 +1,16 @@
 import React, { useState } from "react"
 import { PageContext, PageState } from "../hooks/usePage"
 
-export type PageProviderProps = React.PropsWithChildren
+export interface PageProviderProps extends React.PropsWithChildren {
+  baseTitle?: string
+}
 
-export const PageProvider = ({ children }: PageProviderProps) => {
+export const PageProvider = ({
+  children,
+  baseTitle,
+}: PageProviderProps) => {
   return (
-    <PageContext.Provider value={useState<PageState>({})}>
+    <PageContext.Provider value={useState<PageState>({ baseTitle })}>
       {children}
     </PageContext.Provider>
   )

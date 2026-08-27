@@ -4,7 +4,7 @@ import { PageState, usePage } from "../../hooks/usePage"
 import { CircularProgress } from "../Progress/Progress"
 import { Box } from "../Layout/Layout"
 
-export type PageProps = PageState & React.PropsWithChildren
+export type PageProps = Omit<PageState, "baseTitle"> & React.PropsWithChildren
 
 export const Page: ExtendableComponent<PageProps> = ({
   showSearch,
@@ -22,12 +22,12 @@ export const Page: ExtendableComponent<PageProps> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showSearch, title])
 
+  const documentTitle = [page.baseTitle, title].filter(Boolean).join(": ")
+
   return (
     <>
       <Helmet>
-        <title>
-          {title ? `: ${title}` : ""}
-        </title>
+        <title>{documentTitle}</title>
       </Helmet>
       {children}
     </>

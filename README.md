@@ -101,6 +101,39 @@ Some supporting code was narrowed rather than copied wholesale:
 inlining the palette — so Storybook, the Jest render wrapper and the real app all share one
 theme definition.
 
+### Document titles
+
+`<Page title="…" />` sets the document title to `baseTitle` and `title` joined with `": "`.
+The app-wide part comes from the provider, not the page:
+
+```tsx
+<PageProvider baseTitle="Ads Ops">   {/* once, at the app root */}
+  …
+  <Page title="Campaigns" />         {/* tab reads "Ads Ops: Campaigns" */}
+</PageProvider>
+```
+
+Empty parts are dropped, so a missing piece never leaves a stray separator:
+
+| `baseTitle` | `title` | document title |
+| --- | --- | --- |
+| `"Ads Ops"` | `"Campaigns"` | `"Ads Ops: Campaigns"` |
+| — | `"Campaigns"` | `"Campaigns"` |
+| `"Ads Ops"` | — | `"Ads Ops"` |
+| — | — | *unchanged* (see below) |
+
+Two behaviors worth knowing:
+
+- **A titleless page doesn't reset the tab.** When both parts are empty the composed title is
+  `""`, and Helmet treats that as nothing to set rather than clearing what's there — so the tab
+  keeps the previous page's title, or whatever `index.html` shipped. Only reachable in an app
+  with no `baseTitle`.
+- **`baseTitle` is a one-time seed.** It initializes the provider's state, so changing the prop
+  after mount has no effect. Fine for an app-wide constant; don't try to drive it from state.
+
+`baseTitle` is deliberately **not** a `Page` prop — `PageProps` omits it, so passing it to
+`<Page>` or `<EmbeddedPage>` is a compile error pointing you at the provider instead.
+
 ## Stories
 
 Every component module has a `.stories.tsx` beside it — 143 stories across 20 components,

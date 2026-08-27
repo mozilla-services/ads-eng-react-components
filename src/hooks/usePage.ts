@@ -1,6 +1,7 @@
 import React from "react"
 
 export interface PageState {
+  baseTitle?: string
   showSearch?: boolean
   title?: string
 }
