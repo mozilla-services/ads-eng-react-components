@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext",
+    ],
+    "importHelpers": true,
+    // stricter type-checking for stronger correctness. Recommended by TS
+    "strict": true,
+    // linter checks for common issues
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    // noUnused* overlap with @typescript-eslint/no-unused-vars, can disable if duplicative
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    // use Node's module resolution algorithm, instead of the legacy TS one
+    "moduleResolution": "bundler",
+    // transpile JSX to the automatic React runtime
+    "jsx": "react-jsx",
+    // allow plain JSON files to be imported as modules
+    "resolveJsonModule": true,
+    // interop between ESM and CJS modules. Recommended by TS
+    "esModuleInterop": true,
+    // significant perf increase by skipping checking .d.ts files, particularly those in node_modules. Recommended by TS
+    "skipLibCheck": true,
+    // error out if import and file system have a casing mismatch. Recommended by TS
+    "forceConsistentCasingInFileNames": true,
+    // ensure that each file can be safely transpiled by babel (etc.) without relying on other imports
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    // `vite build` (via vite-plugin-dts + tsconfig.build.json) owns declaration output.
+    // This config exists for editors, ESLint and `npm run check:types`.
+    "noEmit": true,
+    "types": [
+      "@testing-library/jest-dom",
+      "jest",
+      "node",
+    ],
+  },
+  "include": [
+    ".storybook",
+    "src",
+  ],
+}
