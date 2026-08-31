@@ -14,12 +14,22 @@ import { Tooltip } from "../Tooltip/Tooltip"
 import { CircularProgress } from "../Progress/Progress"
 
 const StyledButton = styled(MUIButton)`
-  min-width: 32px;
+  min-width: 2.40675rem;
   padding: 6px;
   text-transform: none;
 
   .MuiButton-icon {
     margin-top: -1px;
+  }
+
+  .MuiButton-endIcon {
+    margin-right: -2px;
+    margin-left: 4px;
+  }
+
+  .MuiButton-startIcon {
+    margin-right: 4px;
+    margin-left: -2px;
   }
 
   &[data-icon-only="true"] {
