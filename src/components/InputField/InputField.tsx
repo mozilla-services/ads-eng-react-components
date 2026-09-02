@@ -78,6 +78,7 @@ export type SelectFieldChangeEvent = MUISelectChangeEvent
 
 export interface SelectFieldProps {
   disabled?: boolean
+  fullWidth?: boolean
   label?: React.ReactNode
   name?: string
   selectParams?: SelectFieldParams
@@ -108,10 +109,10 @@ export const SelectField: ExtendableComponent<SelectFieldProps> = (props: Select
     } as SelectFieldChangeEvent)
   }
 
-  const { disabled, error, helperText, label, name, required, selectParams, size } = props
+  const { disabled, error, fullWidth, helperText, label, name, required, selectParams, size } = props
 
   return (
-    <MUIFormControl key={key} disabled={disabled} error={error} required={required}>
+    <MUIFormControl key={key} disabled={disabled} error={error} fullWidth={fullWidth} required={required}>
       <MUIAutocomplete
         disabled={disabled}
         getOptionKey={option => option.value}
