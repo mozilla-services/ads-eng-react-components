@@ -37,6 +37,13 @@ const StyledButton = styled(MUIButton)`
       margin-left: -4px;
       margin-right: -4px;
     }
+
+    &[data-circular="true"] {
+      .MuiButton-icon {
+        margin-left: 2.25px;
+        margin-right: 2.25px;
+      }
+    }
   }
 `
 
@@ -70,6 +77,7 @@ export const Button: ExtendableComponentWithForwardedRef<ButtonProps, HTMLButton
       <span style={{ borderRadius: props.circular ? "50%" : "0" }}>
         <StyledButton
           ref={ref}
+          data-circular={props.circular}
           aria-label={props.tooltipTitle}
           data-icon-only={iconOnly}
           sx={[
