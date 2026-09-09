@@ -14,7 +14,7 @@ import { Tooltip } from "../Tooltip/Tooltip"
 import { CircularProgress } from "../Progress/Progress"
 
 const StyledButton = styled(MUIButton)`
-  min-width: 2.40675rem;
+  min-width: auto;
   padding: 6px;
   text-transform: none;
 
@@ -67,7 +67,7 @@ export const Button: ExtendableComponentWithForwardedRef<ButtonProps, HTMLButton
       onClose={props.onTooltipClose}
     >
       {/* <Tooltip /> cannot directly wrap a disabled <Button />, so always wrap in a <span /> to handle this case */}
-      <span style={{ borderRadius: props.circular ? "50%" : "0", display: "inline-block" }}>
+      <span style={{ borderRadius: props.circular ? "50%" : "0" }}>
         <StyledButton
           ref={ref}
           aria-label={props.tooltipTitle}
