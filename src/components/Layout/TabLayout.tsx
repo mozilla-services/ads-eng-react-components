@@ -28,7 +28,6 @@ export interface TabProps extends React.PropsWithChildren {
 export const Tab: ExtendableComponent<TabProps> = ({
   children,
   keepMounted,
-  title,
   value,
 }: TabProps) => {
   const [hasBeenSelectedOnce, setHasBeenSelectedOnce] = useState<boolean>(false)
@@ -41,7 +40,7 @@ export const Tab: ExtendableComponent<TabProps> = ({
   }, [hasBeenSelectedOnce, selectedTabValue, value])
 
   return (
-    <StyledTabPanel key={value} keepMounted={keepMounted} title={title} value={value}>
+    <StyledTabPanel key={value} keepMounted={keepMounted} value={value}>
       {hasBeenSelectedOnce && children}
     </StyledTabPanel>
   )
