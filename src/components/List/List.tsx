@@ -79,6 +79,7 @@ export const ListItem: ExtendableComponent<ListItemProps> = ({
         "& .MuiListItemSecondaryAction-root": {
           right: "var(--mui-spacing)",
           "& .MuiButton-root": {
+            ml: 0.5,
             mr: -0.5,
           },
         },

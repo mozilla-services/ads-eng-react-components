@@ -1,4 +1,4 @@
-import { Campaign, Delete, Public, Storefront } from "@mui/icons-material"
+import { Campaign, Delete, Edit, Public, Storefront } from "@mui/icons-material"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { List, ListItem } from "./List"
@@ -98,9 +98,36 @@ export const WithAccessory: Story = {
       </Paper>
       <Paper variant="outlined">
         <List>
-          <ListItem accessory={<Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />} href="/a" title="Advertisers" />
-          <ListItem accessory={<Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />} href="/b" title="Campaigns" />
-          <ListItem accessory={<Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />} href="/c" title="Surfaces" />
+          <ListItem
+            accessory={(
+              <>
+                <Button circular startIcon={<Edit fontSize="small" />} tooltipTitle="Edit" />
+                <Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />
+              </>
+            )}
+            href="/a"
+            title="Q1 Brand"
+          />
+          <ListItem
+            accessory={(
+              <>
+                <Button circular startIcon={<Edit fontSize="small" />} tooltipTitle="Edit" />
+                <Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />
+              </>
+            )}
+            href="/b"
+            title="Q1 Performance"
+          />
+          <ListItem
+            accessory={(
+              <>
+                <Button circular startIcon={<Edit fontSize="small" />} tooltipTitle="Edit" />
+                <Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />
+              </>
+            )}
+            href="/c"
+            title="A campaign with a very long name that has to ellipsize against its accessory"
+          />
         </List>
       </Paper>
     </Stack>
