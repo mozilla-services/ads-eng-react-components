@@ -1,9 +1,10 @@
-import { Campaign, Public, Storefront } from "@mui/icons-material"
+import { Campaign, Delete, Public, Storefront } from "@mui/icons-material"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { List, ListItem } from "./List"
 import { Chip } from "../Chip/Chip"
-import { Paper } from "../Layout/Layout"
+import { Paper, Stack } from "../Layout/Layout"
+import { Button } from "../Button/Button"
 
 /**
  * A navigation list. `List` renders only children whose `baseType` is `ListItem`, inserting
@@ -83,15 +84,26 @@ export const WithIconBadges: Story = {
 /** The accessory's width is reserved so a long title ellipsizes instead of colliding. */
 export const WithAccessory: Story = {
   render: () => (
-    <List>
-      <ListItem accessory={<Chip color="success" label="Live" size="small" />} href="/a" title="Q1 Brand" />
-      <ListItem accessory={<Chip color="warning" label="Pending" size="small" />} href="/b" title="Q1 Performance" />
-      <ListItem
-        accessory={<Chip color="error" label="Failed" size="small" />}
-        href="/c"
-        title="A campaign with a very long name that has to ellipsize against its accessory"
-      />
-    </List>
+    <Stack padding={1} spacing={1}>
+      <Paper variant="outlined">
+        <List>
+          <ListItem accessory={<Chip color="success" label="Live" size="small" />} href="/a" title="Q1 Brand" />
+          <ListItem accessory={<Chip color="warning" label="Pending" size="small" />} href="/b" title="Q1 Performance" />
+          <ListItem
+            accessory={<Chip color="error" label="Failed" size="small" />}
+            href="/c"
+            title="A campaign with a very long name that has to ellipsize against its accessory"
+          />
+        </List>
+      </Paper>
+      <Paper variant="outlined">
+        <List>
+          <ListItem accessory={<Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />} href="/a" title="Advertisers" />
+          <ListItem accessory={<Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />} href="/b" title="Campaigns" />
+          <ListItem accessory={<Button circular startIcon={<Delete fontSize="small" />} tooltipTitle="Delete" />} href="/c" title="Surfaces" />
+        </List>
+      </Paper>
+    </Stack>
   ),
 }
 

@@ -74,10 +74,13 @@ export const ListItem: ExtendableComponent<ListItemProps> = ({
       sx={{
         "& .MuiListItemButton-root": {
           pl: indent !== undefined ? (indent + 1) * 2 : 1,
-          pr: `calc(${accessoryWidth}px + var(--mui-spacing) * 2)`,
+          pr: `calc(${accessoryWidth}px + var(--mui-spacing) * 1.5)`,
         },
         "& .MuiListItemSecondaryAction-root": {
           right: "var(--mui-spacing)",
+          "& .MuiButton-root": {
+            mr: -0.5,
+          },
         },
       }}
     >
