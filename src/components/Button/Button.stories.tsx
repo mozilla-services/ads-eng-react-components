@@ -1,4 +1,4 @@
-import { Add, Delete, Refresh, Search } from "@mui/icons-material"
+import { Add, Delete, Notifications, Refresh, Search } from "@mui/icons-material"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import {
@@ -9,9 +9,11 @@ import {
   PopoverButton,
   RemoteButton,
 } from "./Button"
-import { Stack, Typography } from "../Layout/Layout"
+import { Header, Stack, Typography } from "../Layout/Layout"
 import { TextField } from "../InputField/InputField"
 import { sleep } from "../../utils/async"
+import { Badge } from "../Badge/Badge"
+import { List } from "../List/List"
 
 /**
  * `Button` wraps MUI's with tighter padding, no text transform, and a `Tooltip` that always
@@ -83,7 +85,7 @@ export const WithStartIcon: Story = {
 }
 
 /**
- * With no children the button switches to icon-only layout: negative icon margins tighten
+ * With no children the button switches to icon-only layout: icon margins tighten
  * it to a square, and `tooltipTitle` doubles as the `aria-label`.
  */
 export const IconOnly: Story = {
@@ -214,11 +216,13 @@ export const Dialog: Story = {
         <TextField defaultValue="Mozilla" label="Common name" />
       </DialogButton>
       <DialogButton
-        dialogProps={{ primaryButtonTitle: "Archive", closeButtonTitle: "Keep" }}
-        title="Archive campaign"
+        circular
+        dialogProps={{ primaryButtonTitle: "Delete", closeButtonTitle: "Keep" }}
+        startIcon={<Delete />}
+        tooltipTitle="Delete campaign"
         variant="outlined"
       >
-        This hides the campaign from the default view.
+        This deletes the campaign from the default view.
       </DialogButton>
     </Stack>
   ),
@@ -233,11 +237,13 @@ export const Popover: Story = {
         <TextField label="Placement" size="small" />
       </PopoverButton>
       <PopoverButton
-        popoverProps={{ minWidth: "260px" }}
-        title="Details"
-        variant="outlined"
+        circular
+        color="inherit"
+        startIcon={<Badge badgeContent={3}><Notifications /></Badge>}
+        tooltipTitle="Notifications"
       >
-        <Typography variant="body2">Anchored to the button, closes on outside click.</Typography>
+        <Header title="Notifications" />
+        <List emptyMessage="No unread Notifications" />
       </PopoverButton>
     </Stack>
   ),

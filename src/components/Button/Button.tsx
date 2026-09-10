@@ -15,7 +15,7 @@ import { CircularProgress } from "../Progress/Progress"
 
 const StyledButton = styled(MUIButton)`
   min-width: auto;
-  padding: 6px;
+  padding: 6px 6px 5px;
   text-transform: none;
 
   .MuiButton-icon {
@@ -34,15 +34,8 @@ const StyledButton = styled(MUIButton)`
 
   &[data-icon-only="true"] {
     .MuiButton-icon {
-      margin-left: -4px;
-      margin-right: -4px;
-    }
-
-    &[data-circular="true"] {
-      .MuiButton-icon {
-        margin-left: 2.25px;
-        margin-right: 2.25px;
-      }
+      margin-left: 2px;
+      margin-right: 2px;
     }
   }
 `
@@ -136,7 +129,7 @@ export const DialogButton: ExtendableComponentWithForwardedRef<DialogButtonProps
   return (
     <>
       <Button ref={buttonRef} onClick={onClick} {...filteredProps as Omit<DialogButtonProps, "title">}>{props.title}</Button>
-      <Dialog ref={dialogRef} title={props.title} {...dialogProps}>
+      <Dialog ref={dialogRef} title={props.title ?? props.tooltipTitle} {...dialogProps}>
         {props.children}
       </Dialog>
     </>
