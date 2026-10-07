@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { BackLink, ExternalLink, ExternalLinkOrNone } from "./Link"
+import { BackLink, ExternalLink, ExternalLinkOrNone, Link } from "./Link"
 import { Stack, Typography } from "../Layout/Layout"
 import { getUrlForEmailAddress } from "../../utils/urls"
 
 /**
+ * `Link` is a thin wrapper over MUI's `Link` and the base that `ExternalLink` builds on; all
+ * three share its `baseType`.
+ *
  * `BackLink` prefers real history: if there's something to go back to it renders an anchor
  * that calls `navigate(-1)`, and otherwise falls back to a router link to `to`. Under
  * Storybook's `MemoryRouter` there's no prior entry, so it renders the fallback.
@@ -28,6 +31,19 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const External: Story = {}
+
+/** The plain `Link`, without `ExternalLink`'s trailing newline — it flows inline with text. */
+export const Plain: Story = {
+  render: args => (
+    <Typography variant="body2">
+      View the line item in
+      {" "}
+      <Link {...args}>Equativ</Link>
+      {" "}
+      before approving.
+    </Typography>
+  ),
+}
 
 /** The `::after` newline is why consecutive links stack rather than running together. */
 export const ExternalStacks: Story = {

@@ -37,9 +37,16 @@ export const BackLink = ({
 
 BackLink.displayName = "BackLink"
 
-export type ExternalLinkProps = MUILinkProps
+export type LinkProps = MUILinkProps
 
-export const ExternalLink: ExtendableComponent<ExternalLinkProps> = styled(MUILink)`
+export const Link: ExtendableComponent<LinkProps> = styled(MUILink)``
+
+Link.displayName = "Link"
+Link.baseType = Symbol.for(Link.displayName)
+
+export type ExternalLinkProps = LinkProps
+
+export const ExternalLink: ExtendableComponent<LinkProps> = styled(Link)`
   ::after {
     content: "\\A";
     white-space: pre;
@@ -47,7 +54,7 @@ export const ExternalLink: ExtendableComponent<ExternalLinkProps> = styled(MUILi
 `
 
 ExternalLink.displayName = "ExternalLink"
-ExternalLink.baseType = Symbol.for(ExternalLink.displayName)
+ExternalLink.baseType = Link.baseType
 
 export interface ExternalLinkOrNoneProps extends React.PropsWithChildren {
   href: string | null

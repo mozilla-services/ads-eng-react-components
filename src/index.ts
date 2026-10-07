@@ -117,8 +117,8 @@ export type { SplitLayoutProps } from "./components/Layout/SplitLayout"
 export { Tab, TabLayout } from "./components/Layout/TabLayout"
 export type { TabLayoutProps, TabProps } from "./components/Layout/TabLayout"
 
-export { BackLink, ExternalLink, ExternalLinkOrNone } from "./components/Link/Link"
-export type { BackLinkProps, ExternalLinkOrNoneProps, ExternalLinkProps } from "./components/Link/Link"
+export { BackLink, ExternalLink, ExternalLinkOrNone, Link } from "./components/Link/Link"
+export type { BackLinkProps, ExternalLinkOrNoneProps, ExternalLinkProps, LinkProps } from "./components/Link/Link"
 
 export { List, ListItem } from "./components/List/List"
 export type { ListItemProps, ListProps } from "./components/List/List"

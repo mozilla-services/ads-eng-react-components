@@ -5,6 +5,7 @@ import {
   BackLink,
   ExternalLink,
   ExternalLinkOrNone,
+  Link,
 } from "./Link"
 
 describe("Link.tsx", () => {
@@ -15,6 +16,23 @@ describe("Link.tsx", () => {
 
     const link = result.baseElement.querySelector("a")
     expect(link).toBeInstanceOf(HTMLAnchorElement)
+  })
+
+  test("<Link /> renders a hyperlink with the specified `[href]`", () => {
+    const result = render(
+      <Link href="/foo/bar">Foo</Link>,
+    )
+
+    const link = result.baseElement.querySelector("a")
+    expect(link).toBeInstanceOf(HTMLAnchorElement)
+    expect(link).toHaveAttribute("href", "/foo/bar")
+    expect(link).toHaveTextContent("Foo")
+  })
+
+  test("<ExternalLink /> and <ExternalLinkOrNone /> share the `baseType` of <Link />", () => {
+    expect(Link.baseType).toBe(Symbol.for("Link"))
+    expect(ExternalLink.baseType).toBe(Link.baseType)
+    expect(ExternalLinkOrNone.baseType).toBe(Link.baseType)
   })
 
   test("<ExternalLink /> renders a hyperlink with the specified `[href]`", () => {
