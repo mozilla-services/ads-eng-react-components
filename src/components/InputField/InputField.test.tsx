@@ -60,4 +60,26 @@ describe("InputField.tsx", () => {
     const field = result.baseElement.querySelector<HTMLInputElement>("input[type=\"checkbox\"]")
     expect(field?.checked).toBe(true)
   })
+
+  test("<CheckboxField /> renders its `label` and `helperText` once, outside the checkbox", () => {
+    const result = render(
+      <CheckboxField error helperText="Must be checked" label="Foo" value={false} />,
+    )
+
+    const checkbox = result.baseElement.querySelector(".MuiCheckbox-root")
+    expect(checkbox).not.toHaveAttribute("label")
+    expect(checkbox).not.toHaveAttribute("helpertext")
+    expect(checkbox).not.toHaveAttribute("error")
+    expect(checkbox).not.toHaveTextContent("Foo")
+    expect(result.getAllByText("Foo")).toHaveLength(1)
+    expect(result.getAllByText("Must be checked")).toHaveLength(1)
+  })
+
+  test("<CheckboxField /> applies `error` to its helper text", () => {
+    const result = render(
+      <CheckboxField error helperText="Must be checked" label="Foo" value={false} />,
+    )
+
+    expect(result.getByText("Must be checked")).toHaveClass("Mui-error")
+  })
 })

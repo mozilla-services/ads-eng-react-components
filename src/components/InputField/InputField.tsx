@@ -60,12 +60,18 @@ export interface CheckboxFieldProps extends MUICheckboxProps {
 
 export const CheckboxField: ExtendableComponent<CheckboxFieldProps> = (props: CheckboxFieldProps) => {
   const id = useId()
+
+  const filteredProps: Partial<CheckboxFieldProps> = { ...props }
+  delete filteredProps.error
+  delete filteredProps.helperText
+  delete filteredProps.label
+
   return (
     <MUIFormControl sx={{ alignItems: "center", flexDirection: "row" }}>
       <MUIInputLabel htmlFor={id} shrink>
         {props.label}
       </MUIInputLabel>
-      <MUICheckbox id={id} sx={{ alignSelf: "flex-start", marginTop: 1 }} checked={!!props.value} {...props} />
+      <MUICheckbox id={id} sx={{ alignSelf: "flex-start", marginTop: 1 }} checked={!!props.value} {...filteredProps} />
       <MUIFormHelperText error={props.error} sx={{ ml: 1, mt: 1 }}>{props.helperText}</MUIFormHelperText>
     </MUIFormControl>
   )
