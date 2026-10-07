@@ -4,7 +4,12 @@ import {
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import React from "react"
-import { Link as ReactRouterLink, To, useLocation, useNavigate } from "react-router-dom"
+import {
+  useLocation,
+  useNavigate,
+  Link as ReactRouterLink,
+  To,
+} from "react-router-dom"
 
 export interface BackLinkProps extends React.PropsWithChildren {
   to: To
@@ -39,7 +44,11 @@ BackLink.displayName = "BackLink"
 
 export type LinkProps = MUILinkProps
 
-export const Link: ExtendableComponent<LinkProps> = styled(MUILink)``
+export const Link: ExtendableComponent<LinkProps> = (props: LinkProps) => {
+  return (
+    <MUILink rel="noreferrer" target="_blank" {...props} />
+  )
+}
 
 Link.displayName = "Link"
 Link.baseType = Symbol.for(Link.displayName)
@@ -74,7 +83,7 @@ export const ExternalLinkOrNone: ExtendableComponent<ExternalLinkOrNoneProps> = 
 
   return (
     <>
-      <ExternalLink href={href} rel="noreferrer" target="_blank">{content}</ExternalLink>
+      <ExternalLink href={href}>{content}</ExternalLink>
     </>
   )
 }

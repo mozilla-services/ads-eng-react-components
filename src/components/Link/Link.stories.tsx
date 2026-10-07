@@ -5,8 +5,9 @@ import { Stack, Typography } from "../Layout/Layout"
 import { getUrlForEmailAddress } from "../../utils/urls"
 
 /**
- * `Link` is a thin wrapper over MUI's `Link` and the base that `ExternalLink` builds on; all
- * three share its `baseType`.
+ * `Link` wraps MUI's `Link`, defaulting to `rel="noreferrer"` and `target="_blank"` (pass
+ * either to override). It's the base that `ExternalLink` builds on; all three share its
+ * `baseType`.
  *
  * `BackLink` prefers real history: if there's something to go back to it renders an anchor
  * that calls `navigate(-1)`, and otherwise falls back to a router link to `to`. Under
@@ -32,7 +33,7 @@ type Story = StoryObj<typeof meta>
 
 export const External: Story = {}
 
-/** The plain `Link`, without `ExternalLink`'s trailing newline — it flows inline with text. */
+/** The plain `Link`, without `ExternalLink`'s trailing newline — it flows inline with text. Opens in a new tab. */
 export const Plain: Story = {
   render: args => (
     <Typography variant="body2">
@@ -49,9 +50,9 @@ export const Plain: Story = {
 export const ExternalStacks: Story = {
   render: () => (
     <Typography component="div" variant="body2">
-      <ExternalLink href="https://example.com/a" rel="noreferrer" target="_blank">Placement A</ExternalLink>
-      <ExternalLink href="https://example.com/b" rel="noreferrer" target="_blank">Placement B</ExternalLink>
-      <ExternalLink href="https://example.com/c" rel="noreferrer" target="_blank">Placement C</ExternalLink>
+      <ExternalLink href="https://example.com/a">Placement A</ExternalLink>
+      <ExternalLink href="https://example.com/b">Placement B</ExternalLink>
+      <ExternalLink href="https://example.com/c">Placement C</ExternalLink>
     </Typography>
   ),
 }

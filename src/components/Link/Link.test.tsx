@@ -29,6 +29,26 @@ describe("Link.tsx", () => {
     expect(link).toHaveTextContent("Foo")
   })
 
+  test("<Link /> opens in a new tab with `[rel=\"noreferrer\"]` by default", () => {
+    const result = render(
+      <Link href="/foo/bar">Foo</Link>,
+    )
+
+    const link = result.baseElement.querySelector("a")
+    expect(link).toHaveAttribute("rel", "noreferrer")
+    expect(link).toHaveAttribute("target", "_blank")
+  })
+
+  test("<Link /> allows `[rel]` and `[target]` to be overridden", () => {
+    const result = render(
+      <Link href="/foo/bar" rel="nofollow" target="_self">Foo</Link>,
+    )
+
+    const link = result.baseElement.querySelector("a")
+    expect(link).toHaveAttribute("rel", "nofollow")
+    expect(link).toHaveAttribute("target", "_self")
+  })
+
   test("<ExternalLink /> and <ExternalLinkOrNone /> share the `baseType` of <Link />", () => {
     expect(Link.baseType).toBe(Symbol.for("Link"))
     expect(ExternalLink.baseType).toBe(Link.baseType)
@@ -42,6 +62,9 @@ describe("Link.tsx", () => {
 
     const link = result.baseElement.querySelector("a")
     expect(link).toBeInstanceOf(HTMLAnchorElement)
+    expect(link).toHaveAttribute("href", "/foo/bar")
+    expect(link).toHaveAttribute("rel", "noreferrer")
+    expect(link).toHaveAttribute("target", "_blank")
   })
 
   test("<ExternalLinkOrNone /> renders a hyperlink with the specified `[href]`", () => {
